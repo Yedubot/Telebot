@@ -1,0 +1,42 @@
+from telegram.ext import Updater, MessageHandler, Filters
+import logging
+
+# Enable logging
+logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+                    level=logging.INFO)
+
+logger = logging.getLogger(__name__)
+
+# Define your filter patterns
+filter_patterns = [
+    'badword1',
+    'badword2',
+    # Add more patterns as needed
+]
+
+def filter_text(update, context):
+    message = update.message.text.lower()
+    for pattern in filter_patterns:
+        if pattern in message:
+            # Delete the message that contains filtered words
+            context.bot.delete_message(chat_id=update.effective_chat.id,
+                                       message_id=update.message.message_id)
+            logger.info(f"Filtered message from {update.message.from_user.username}: {update.message.text}")
+            return
+
+def main():
+    # Set up the bot
+    updater = Updater("6998980951:AAF5svMFJFKFLD0jnNjHKHcu1KBHjdn9BJ0", use_context=True)
+
+    # Get the dispatcher to register handlers
+    dp = updater.dispatcher
+
+    # Register message handler
+    dp.add_handler(MessageHandler(Filters.text & ~Filters.command, filter_text))
+
+    # Start the Bot
+    updater.start_polling()
+    updater.idle()
+
+if __name__ == '__main__':
+    main()
